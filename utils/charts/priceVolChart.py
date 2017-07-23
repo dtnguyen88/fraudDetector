@@ -41,7 +41,8 @@ def plot_price_volume(df, skip_weekends=True, bollinger=True):
     ax1.yaxis.set_major_formatter(FuncFormatter(millions))
     if not skip_weekends:
         for (s,l) in price_series:
-            ax0.plot(df.Date.values, s, '-', label=l)
+            line_type = '--' if l in ['upper', 'lower'] else '-'
+            ax0.plot(df.Date.values, s, line_type, label=l)
         ax1.bar(df.Date.values, df.Volume, color='green', edgecolor='green')
     else:
         N = df.shape[0]
@@ -49,7 +50,8 @@ def plot_price_volume(df, skip_weekends=True, bollinger=True):
         ind = np.arange(N)
         ax0.xaxis.set_major_formatter(dateFormatter)
         for (s,l) in price_series:
-            ax0.plot(ind, s, '-', label=l)
+            line_type = '--' if l in ['upper', 'lower'] else '-'
+            ax0.plot(ind, s, line_type, label=l)
         ax1.bar(ind, df.Volume, edgecolor='green', color='green')
     ax0.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
