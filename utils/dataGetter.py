@@ -1,28 +1,41 @@
-import urllib.request
+import urllib
 import pandas as pd
 import zipfile
 
-def getData(date):
+
+def getIndexData(date):
+    link = 'http://images1.cafef.vn/data/'+date.strftime('%Y%m%d') + \
+    '/CafeF.Index.Upto'+date.strftime('%d%m%Y') +'.zip'
+    #fileName = 'D:\\python\\vnstock\\history.zip'
+    fileName = '/tmp/history_index.zip'
+    #req = urllib2.urlopen(link)
+    response = urllib.urlopen(link)
+
+    file = open(fileName, 'wb')
+    file.write(response.read())
+    file.close()
+    frame = getDataFromFile( fileName )
+    return(frame)
+
+
+def getStockData(date):
+    '''
+    Retrieve data from cafef.vn. Input is a date, returns the dataframe.
+
+    Data is saved at /tmp/history.zip by default.
+
+    '''
     link = 'http://images1.cafef.vn/data/'+date.strftime('%Y%m%d') + \
     '/CafeF.SolieuGD.Upto'+date.strftime('%d%m%Y') +'.zip'
     #fileName = 'D:\\python\\vnstock\\history.zip'
     fileName = '/tmp/history.zip'
     #req = urllib2.urlopen(link)
-    response = urllib.request.urlopen(link)
+    response = urllib.urlopen(link)
 
     file = open(fileName, 'wb')
     file.write(response.read())
     file.close()
-    exchanges = ['HSX','HNX']
-    list_ =[]
-    with zipfile.ZipFile(fileName) as myzip:
-        for exchange in exchanges:
-            with myzip.open('CafeF.'+exchange+'.Upto'+date.strftime('%d.%m.%Y')+'.csv') as myfile:
-                data = pd.read_csv(myfile, header = 0,names = ['Ticker','Date','Open','High','Low','Close','Volume'])
-                data['Exchange'] = exchange
-                list_.append(data)
-    frame = pd.concat(list_)
-    frame['Date'] = pd.to_datetime(frame.Date, format='%Y%m%d')
+    frame = getDataFromFile( fileName )
     return(frame)
 
 
